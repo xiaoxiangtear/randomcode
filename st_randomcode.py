@@ -37,7 +37,7 @@ def main(digits):
         cursor.execute(sql_insert, [c])
         conn.commit()  # 涉及写操作要注意提交
 
-        return c
+        return c, 1
     except:
         print('表`{}`已存在'.format(tb_name))
         code_df = pd.read_sql(f'select * from `digits-{digits}`', con=conn)
@@ -46,9 +46,9 @@ def main(digits):
           c2 = generate_numeric_code(digits)
           if not c2 in code_lt:
             sql_insert = f'replace into `digits-{digits}` (`code`) values (?)'
-            cursor.execute(sql_insert, [c])
+            cursor.execute(sql_insert, [c2])
             conn.commit()  # 涉及写操作要注意提交
-            return c2
+            return c2, code_lt.__len__()+1
           else:
             print(f'随机码{c2}已存在，请再生成一次！')
 
@@ -60,5 +60,5 @@ if __name__ == '__main__':
 
     digits = st.selectbox(label='digits', options=range(2,11))
     if st.button('生成'):
-        code = main(digits)
-        st.write(f'随机码：{code}')
+        code, k = main(digits)
+        st.write(f'随机码：{code}, 已有{k}个')
